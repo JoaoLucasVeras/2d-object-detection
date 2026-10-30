@@ -1,0 +1,35 @@
+# Python and development environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+
+# Large downloaded or generated artifacts
+data/
+datasets/
+checkpoints/
+weights/
+runs/
+predictions/
+*.pt
+*.pth
+*.onnx
+*.engine
+*.zip
+*.tar
+*.tar.gz
+
+# Local scratch and OS files
+tmp/
+.DS_Store
+Thumbs.db
