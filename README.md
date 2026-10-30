@@ -24,9 +24,9 @@ How do pretrained object detectors compare in accuracy and inference speed, and 
 - Evaluate at least two datasets or domains.
 - Analyze cross-dataset generalization and speed-accuracy tradeoffs.
 - Use pretrained checkpoints; fine-tuning is optional.
-- Target hardware: NVIDIA GeForce RTX 3060 Ti. GPU execution is not yet verified.
+- Hardware: NVIDIA GeForce RTX 3060 Ti (verified).
 
-Starter configurations are YOLO11 nano, YOLO11 small, and Faster R-CNN MobileNetV3 320 FPN; see `configs/models.json`. These meet the model-count and family-count requirements. GPU compatibility remains to be verified on the desktop. COCO validation and KITTI are candidate datasets; splits and class mappings remain pending.
+Configurations: YOLO11n, YOLO11s, RT-DETR-L, Faster R-CNN MobileNetV3-320-FPN, and Faster R-CNN R50-FPN-v2 (three families); see `configs/models.json`. Datasets: COCO val2017 and KITTI val with the mapping in `configs/kitti_taxonomy.json`.
 
 ## Project layout
 
@@ -54,6 +54,20 @@ For each experiment record the model/checkpoint, dataset/split, input resolution
 
 The submission also needs at least eight credible technical references, including four original research papers and two official repository/framework documentation sources. Include or link experiment code, configurations, or command logs.
 
+## Reproduce
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run_all.ps1        # downloads data, 5 models x 2 datasets
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run_ablations.ps1
+.\.venv\Scripts\python.exe scripts\failure_analysis.py --dataset kitti --draw yolo11s
+.\.venv\Scripts\python.exe scripts\failure_analysis.py --dataset coco
+.\.venv\Scripts\python.exe scripts\summarize.py
+.\.venv\Scripts\python.exe scripts\build_report.py
+```
+
+Data downloads need about 1.5 GB (COCO val2017, KITTI val images, KITTI labels). The full run took about 40 minutes on the RTX 3060 Ti.
+
 ## Status
 
-Desktop bootstrap and GPU smoke-test scripts are prepared. Dataset evaluation is not yet implemented. No models have been evaluated and no experimental results are claimed.
+All experiments are complete. Report: `report/report.pdf`. Tables: `results/summary.md`. Per-run records: `results/runs/`. Metrics: `results/metrics/`. Command log: `results/command_log.txt`. See `docs/experiment-plan.md` for decisions and results.

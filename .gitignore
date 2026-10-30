@@ -34,3 +34,10 @@ tmp/
 results/local/
 .DS_Store
 Thumbs.db
+
+# Rendered report previews
+report/report.html
+Ultralytics/
+
+# Small per-run records (commands, settings, timing) are evidence and are kept
+!results/runs/

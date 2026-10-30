@@ -1,0 +1,286 @@
+{
+  "description": "Break detections into error types at an operating point and draw example failures.",
+  "classes": {
+    "1": "person",
+    "3": "car",
+    "8": "truck"
+  },
+  "results": [
+    {
+      "model": "yolo11n",
+      "dataset": "coco",
+      "threshold": 0.25,
+      "f1_iou50": 0.7089,
+      "false_positive_types": {
+        "class_conf": 118,
+        "localization": 759,
+        "background": 575,
+        "duplicate": 427
+      },
+      "miss_rate_by_height": {
+        "<25px": 0.794,
+        "25-40px": 0.55,
+        "40-100px": 0.348,
+        ">=100px": 0.108
+      },
+      "gt_count_by_height": {
+        ">=100px": 5124,
+        "25-40px": 1756,
+        "40-100px": 3551,
+        "<25px": 2678
+      },
+      "miss_rate_by_occlusion": {},
+      "per_class": {
+        "person": {
+          "tp": 7083,
+          "gt": 10777,
+          "ignored": 552,
+          "missed": 3694,
+          "duplicate": 354,
+          "localization": 606,
+          "background": 421,
+          "class_conf": 2
+        },
+        "car": {
+          "tp": 993,
+          "class_conf": 78,
+          "localization": 134,
+          "gt": 1918,
+          "missed": 925,
+          "background": 119,
+          "duplicate": 65,
+          "ignored": 49
+        },
+        "truck": {
+          "tp": 153,
+          "gt": 414,
+          "missed": 261,
+          "background": 35,
+          "class_conf": 38,
+          "localization": 19,
+          "duplicate": 8
+        }
+      }
+    },
+    {
+      "model": "yolo11s",
+      "dataset": "coco",
+      "threshold": 0.25,
+      "f1_iou50": 0.7563,
+      "false_positive_types": {
+        "class_conf": 128,
+        "localization": 772,
+        "duplicate": 373,
+        "background": 740
+      },
+      "miss_rate_by_height": {
+        "<25px": 0.689,
+        "25-40px": 0.428,
+        "40-100px": 0.264,
+        ">=100px": 0.074
+      },
+      "gt_count_by_height": {
+        ">=100px": 5124,
+        "25-40px": 1756,
+        "40-100px": 3551,
+        "<25px": 2678
+      },
+      "miss_rate_by_occlusion": {},
+      "per_class": {
+        "person": {
+          "tp": 7830,
+          "gt": 10777,
+          "ignored": 628,
+          "missed": 2947,
+          "localization": 615,
+          "duplicate": 312,
+          "background": 522
+        },
+        "car": {
+          "tp": 1169,
+          "class_conf": 79,
+          "localization": 139,
+          "gt": 1918,
+          "missed": 749,
+          "background": 166,
+          "ignored": 57,
+          "duplicate": 52
+        },
+        "truck": {
+          "tp": 197,
+          "gt": 414,
+          "missed": 217,
+          "background": 52,
+          "class_conf": 49,
+          "localization": 18,
+          "duplicate": 9
+        }
+      }
+    },
+    {
+      "model": "rtdetr_l",
+      "dataset": "coco",
+      "threshold": 0.45,
+      "f1_iou50": 0.7933,
+      "false_positive_types": {
+        "class_conf": 130,
+        "localization": 617,
+        "background": 611,
+        "duplicate": 122
+      },
+      "miss_rate_by_height": {
+        "<25px": 0.615,
+        "25-40px": 0.382,
+        "40-100px": 0.23,
+        ">=100px": 0.075
+      },
+      "gt_count_by_height": {
+        ">=100px": 5124,
+        "25-40px": 1756,
+        "40-100px": 3551,
+        "<25px": 2678
+      },
+      "miss_rate_by_occlusion": {},
+      "per_class": {
+        "person": {
+          "tp": 8082,
+          "gt": 10777,
+          "ignored": 538,
+          "missed": 2695,
+          "localization": 453,
+          "background": 385,
+          "duplicate": 93
+        },
+        "car": {
+          "tp": 1279,
+          "class_conf": 83,
+          "gt": 1918,
+          "background": 175,
+          "missed": 639,
+          "localization": 149,
+          "ignored": 22,
+          "duplicate": 25
+        },
+        "truck": {
+          "tp": 229,
+          "gt": 414,
+          "missed": 185,
+          "background": 51,
+          "class_conf": 47,
+          "localization": 15,
+          "duplicate": 4,
+          "ignored": 2
+        }
+      }
+    },
+    {
+      "model": "frcnn_mbv3_320",
+      "dataset": "coco",
+      "threshold": 0.45,
+      "f1_iou50": 0.5557,
+      "false_positive_types": {
+        "background": 351,
+        "class_conf": 89,
+        "localization": 1014,
+        "duplicate": 100
+      },
+      "miss_rate_by_height": {
+        "<25px": 0.989,
+        "25-40px": 0.916,
+        "40-100px": 0.648,
+        ">=100px": 0.177
+      },
+      "gt_count_by_height": {
+        ">=100px": 5124,
+        "25-40px": 1756,
+        "40-100px": 3551,
+        "<25px": 2678
+      },
+      "miss_rate_by_occlusion": {},
+      "per_class": {
+        "person": {
+          "tp": 5074,
+          "background": 267,
+          "gt": 10777,
+          "missed": 5703,
+          "localization": 885,
+          "ignored": 579,
+          "duplicate": 90,
+          "class_conf": 1
+        },
+        "car": {
+          "tp": 451,
+          "class_conf": 62,
+          "gt": 1918,
+          "missed": 1467,
+          "localization": 118,
+          "duplicate": 10,
+          "background": 50,
+          "ignored": 18
+        },
+        "truck": {
+          "tp": 117,
+          "gt": 414,
+          "missed": 297,
+          "class_conf": 26,
+          "background": 34,
+          "localization": 11
+        }
+      }
+    },
+    {
+      "model": "frcnn_r50_v2",
+      "dataset": "coco",
+      "threshold": 0.7,
+      "f1_iou50": 0.7975,
+      "false_positive_types": {
+        "class_conf": 87,
+        "background": 1076,
+        "localization": 974,
+        "duplicate": 72
+      },
+      "miss_rate_by_height": {
+        "<25px": 0.503,
+        "25-40px": 0.318,
+        "40-100px": 0.194,
+        ">=100px": 0.069
+      },
+      "gt_count_by_height": {
+        ">=100px": 5124,
+        "25-40px": 1756,
+        "40-100px": 3551,
+        "<25px": 2678
+      },
+      "miss_rate_by_occlusion": {},
+      "per_class": {
+        "person": {
+          "tp": 8576,
+          "gt": 10777,
+          "ignored": 1218,
+          "missed": 2201,
+          "background": 782,
+          "localization": 763,
+          "duplicate": 58
+        },
+        "car": {
+          "tp": 1375,
+          "class_conf": 63,
+          "background": 251,
+          "gt": 1918,
+          "missed": 543,
+          "localization": 187,
+          "duplicate": 14,
+          "ignored": 102
+        },
+        "truck": {
+          "tp": 208,
+          "gt": 414,
+          "missed": 206,
+          "class_conf": 24,
+          "localization": 24,
+          "background": 43
+        }
+      }
+    }
+  ]
+}

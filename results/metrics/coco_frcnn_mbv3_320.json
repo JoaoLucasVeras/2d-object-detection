@@ -1,0 +1,453 @@
+{
+  "dataset": "coco",
+  "model": "frcnn_mbv3_320",
+  "predictions_file": "predictions/coco/frcnn_mbv3_320.json",
+  "evaluator": "pycocotools COCOeval bbox, maxDets=100, IoU 0.50:0.05:0.95; iscrowd/ignore regions excluded",
+  "all_classes": {
+    "AP": 23.08,
+    "AP50": 38.88,
+    "AP75": 23.42,
+    "AP_small": 2.8,
+    "AP_medium": 22.29,
+    "AP_large": 44.9,
+    "AR1": 22.16,
+    "AR10": 31.35,
+    "AR100": 32.06,
+    "AR_small": 5.27,
+    "AR_medium": 33.47,
+    "AR_large": 60.53,
+    "per_class": {
+      "person": {
+        "AP": 29.93,
+        "AP50": 52.39,
+        "num_gt": 10777
+      },
+      "bicycle": {
+        "AP": 14.97,
+        "AP50": 30.11,
+        "num_gt": 314
+      },
+      "car": {
+        "AP": 13.73,
+        "AP50": 27.46,
+        "num_gt": 1918
+      },
+      "motorcycle": {
+        "AP": 28.38,
+        "AP50": 55.37,
+        "num_gt": 367
+      },
+      "airplane": {
+        "AP": 46.77,
+        "AP50": 73.75,
+        "num_gt": 143
+      },
+      "bus": {
+        "AP": 46.88,
+        "AP50": 62.67,
+        "num_gt": 283
+      },
+      "train": {
+        "AP": 54.89,
+        "AP50": 79.96,
+        "num_gt": 190
+      },
+      "truck": {
+        "AP": 17.98,
+        "AP50": 31.78,
+        "num_gt": 414
+      },
+      "boat": {
+        "AP": 9.8,
+        "AP50": 21.61,
+        "num_gt": 424
+      },
+      "traffic light": {
+        "AP": 5.62,
+        "AP50": 14.23,
+        "num_gt": 634
+      },
+      "fire hydrant": {
+        "AP": 42.46,
+        "AP50": 61.58,
+        "num_gt": 101
+      },
+      "stop sign": {
+        "AP": 45.05,
+        "AP50": 55.12,
+        "num_gt": 75
+      },
+      "parking meter": {
+        "AP": 27.02,
+        "AP50": 42.66,
+        "num_gt": 60
+      },
+      "bench": {
+        "AP": 12.08,
+        "AP50": 21.92,
+        "num_gt": 411
+      },
+      "bird": {
+        "AP": 15.3,
+        "AP50": 25.87,
+        "num_gt": 427
+      },
+      "cat": {
+        "AP": 58.4,
+        "AP50": 85.62,
+        "num_gt": 202
+      },
+      "dog": {
+        "AP": 47.26,
+        "AP50": 70.53,
+        "num_gt": 218
+      },
+      "horse": {
+        "AP": 40.05,
+        "AP50": 63.86,
+        "num_gt": 272
+      },
+      "sheep": {
+        "AP": 23.76,
+        "AP50": 43.44,
+        "num_gt": 354
+      },
+      "cow": {
+        "AP": 26.55,
+        "AP50": 46.4,
+        "num_gt": 372
+      },
+      "elephant": {
+        "AP": 42.68,
+        "AP50": 71.09,
+        "num_gt": 252
+      },
+      "bear": {
+        "AP": 60.95,
+        "AP50": 81.96,
+        "num_gt": 71
+      },
+      "zebra": {
+        "AP": 49.82,
+        "AP50": 77.99,
+        "num_gt": 266
+      },
+      "giraffe": {
+        "AP": 50.73,
+        "AP50": 78.49,
+        "num_gt": 232
+      },
+      "backpack": {
+        "AP": 3.28,
+        "AP50": 7.89,
+        "num_gt": 371
+      },
+      "umbrella": {
+        "AP": 21.35,
+        "AP50": 38.8,
+        "num_gt": 407
+      },
+      "handbag": {
+        "AP": 1.84,
+        "AP50": 4.79,
+        "num_gt": 540
+      },
+      "tie": {
+        "AP": 12.96,
+        "AP50": 23.45,
+        "num_gt": 252
+      },
+      "suitcase": {
+        "AP": 18.04,
+        "AP50": 32.85,
+        "num_gt": 299
+      },
+      "frisbee": {
+        "AP": 24.54,
+        "AP50": 45.48,
+        "num_gt": 115
+      },
+      "skis": {
+        "AP": 8.84,
+        "AP50": 22.07,
+        "num_gt": 241
+      },
+      "snowboard": {
+        "AP": 16.05,
+        "AP50": 32.35,
+        "num_gt": 69
+      },
+      "sports ball": {
+        "AP": 10.07,
+        "AP50": 20.44,
+        "num_gt": 260
+      },
+      "kite": {
+        "AP": 16.73,
+        "AP50": 34.17,
+        "num_gt": 327
+      },
+      "baseball bat": {
+        "AP": 11.33,
+        "AP50": 30.85,
+        "num_gt": 145
+      },
+      "baseball glove": {
+        "AP": 10.05,
+        "AP50": 23.37,
+        "num_gt": 148
+      },
+      "skateboard": {
+        "AP": 23.84,
+        "AP50": 51.09,
+        "num_gt": 179
+      },
+      "surfboard": {
+        "AP": 19.45,
+        "AP50": 39.98,
+        "num_gt": 267
+      },
+      "tennis racket": {
+        "AP": 23.12,
+        "AP50": 48.51,
+        "num_gt": 225
+      },
+      "bottle": {
+        "AP": 8.59,
+        "AP50": 16.79,
+        "num_gt": 1013
+      },
+      "wine glass": {
+        "AP": 9.57,
+        "AP50": 18.17,
+        "num_gt": 341
+      },
+      "cup": {
+        "AP": 14.01,
+        "AP50": 24.11,
+        "num_gt": 895
+      },
+      "fork": {
+        "AP": 10.7,
+        "AP50": 22.12,
+        "num_gt": 215
+      },
+      "knife": {
+        "AP": 2.65,
+        "AP50": 5.83,
+        "num_gt": 325
+      },
+      "spoon": {
+        "AP": 2.99,
+        "AP50": 6.62,
+        "num_gt": 253
+      },
+      "bowl": {
+        "AP": 21.41,
+        "AP50": 34.62,
+        "num_gt": 623
+      },
+      "banana": {
+        "AP": 12.18,
+        "AP50": 26.88,
+        "num_gt": 370
+      },
+      "apple": {
+        "AP": 8.43,
+        "AP50": 13.51,
+        "num_gt": 236
+      },
+      "sandwich": {
+        "AP": 25.24,
+        "AP50": 41.06,
+        "num_gt": 177
+      },
+      "orange": {
+        "AP": 16.82,
+        "AP50": 26.77,
+        "num_gt": 285
+      },
+      "broccoli": {
+        "AP": 12.07,
+        "AP50": 29.63,
+        "num_gt": 312
+      },
+      "carrot": {
+        "AP": 7.44,
+        "AP50": 17.46,
+        "num_gt": 365
+      },
+      "hot dog": {
+        "AP": 21.08,
+        "AP50": 37.78,
+        "num_gt": 125
+      },
+      "pizza": {
+        "AP": 37.97,
+        "AP50": 54.91,
+        "num_gt": 284
+      },
+      "donut": {
+        "AP": 20.26,
+        "AP50": 31.64,
+        "num_gt": 328
+      },
+      "cake": {
+        "AP": 18.95,
+        "AP50": 33.48,
+        "num_gt": 310
+      },
+      "chair": {
+        "AP": 10.7,
+        "AP50": 22.93,
+        "num_gt": 1771
+      },
+      "couch": {
+        "AP": 35.43,
+        "AP50": 57.93,
+        "num_gt": 261
+      },
+      "potted plant": {
+        "AP": 10.58,
+        "AP50": 24.11,
+        "num_gt": 342
+      },
+      "bed": {
+        "AP": 40.31,
+        "AP50": 61.89,
+        "num_gt": 163
+      },
+      "dining table": {
+        "AP": 23.7,
+        "AP50": 38.25,
+        "num_gt": 695
+      },
+      "toilet": {
+        "AP": 50.44,
+        "AP50": 75.64,
+        "num_gt": 179
+      },
+      "tv": {
+        "AP": 40.92,
+        "AP50": 62.92,
+        "num_gt": 288
+      },
+      "laptop": {
+        "AP": 42.06,
+        "AP50": 60.45,
+        "num_gt": 231
+      },
+      "mouse": {
+        "AP": 23.54,
+        "AP50": 43.07,
+        "num_gt": 106
+      },
+      "remote": {
+        "AP": 5.12,
+        "AP50": 10.43,
+        "num_gt": 283
+      },
+      "keyboard": {
+        "AP": 31.96,
+        "AP50": 53.91,
+        "num_gt": 153
+      },
+      "cell phone": {
+        "AP": 13.87,
+        "AP50": 25.83,
+        "num_gt": 262
+      },
+      "microwave": {
+        "AP": 30.56,
+        "AP50": 45.92,
+        "num_gt": 55
+      },
+      "oven": {
+        "AP": 26.05,
+        "AP50": 45.81,
+        "num_gt": 143
+      },
+      "toaster": {
+        "AP": 12.51,
+        "AP50": 20.11,
+        "num_gt": 9
+      },
+      "sink": {
+        "AP": 22.8,
+        "AP50": 41.39,
+        "num_gt": 225
+      },
+      "refrigerator": {
+        "AP": 39.3,
+        "AP50": 58.57,
+        "num_gt": 126
+      },
+      "book": {
+        "AP": 2.35,
+        "AP50": 7.28,
+        "num_gt": 1129
+      },
+      "clock": {
+        "AP": 26.24,
+        "AP50": 49.85,
+        "num_gt": 267
+      },
+      "vase": {
+        "AP": 15.05,
+        "AP50": 25.96,
+        "num_gt": 274
+      },
+      "scissors": {
+        "AP": 20.47,
+        "AP50": 33.19,
+        "num_gt": 36
+      },
+      "teddy bear": {
+        "AP": 32.56,
+        "AP50": 55.29,
+        "num_gt": 190
+      },
+      "hair drier": {
+        "AP": 0.05,
+        "AP50": 0.16,
+        "num_gt": 11
+      },
+      "toothbrush": {
+        "AP": 7.14,
+        "AP50": 16.51,
+        "num_gt": 57
+      }
+    }
+  },
+  "shared_classes": {
+    "AP": 20.55,
+    "AP50": 37.21,
+    "AP75": 20.21,
+    "AP_small": 2.1,
+    "AP_medium": 22.98,
+    "AP_large": 53.98,
+    "AR1": 15.4,
+    "AR10": 28.69,
+    "AR100": 29.9,
+    "AR_small": 5.51,
+    "AR_medium": 36.26,
+    "AR_large": 68.63,
+    "per_class": {
+      "person": {
+        "AP": 29.93,
+        "AP50": 52.39,
+        "num_gt": 10777
+      },
+      "car": {
+        "AP": 13.73,
+        "AP50": 27.46,
+        "num_gt": 1918
+      },
+      "truck": {
+        "AP": 17.98,
+        "AP50": 31.78,
+        "num_gt": 414
+      }
+    }
+  }
+}

@@ -1,38 +1,37 @@
 # Experiment plan
 
-## Decisions pending
+## Status (2026-10-30)
 
-- Confirm GPU access, available disk space, and software environment.
-- Verify starter configurations: YOLO11n, YOLO11s, and Faster R-CNN MobileNetV3 320 FPN (two families).
-- Finalize datasets, labeled evaluation splits, and any fixed subsets.
-- Define shared categories, taxonomy mappings, and ignore policies before evaluation.
+All planned experiments are complete on the RTX 3060 Ti. The report is `report/report.pdf` (source `report/report.md`). Every number comes from runs recorded in `results/runs` and `results/metrics`. `results/summary.md` collects the tables, and `results/command_log.txt` holds every executed command.
 
-## Intended evaluation matrix
+## Decisions made
 
-| Configuration | Dataset/domain 1 | Dataset/domain 2 |
+- **Models (5 configurations, 3 families):** YOLO11n, YOLO11s (YOLO); RT-DETR-L (DETR); Faster R-CNN MobileNetV3-Large-320-FPN and ResNet-50-FPN-v2 (R-CNN). See `configs/models.json`.
+- **Datasets:** COCO val2017 (5,000 images, official annotations) and the KITTI 2D-object val split distributed by Ultralytics (1,496 images from the official training set), re-labeled with the official KITTI `label_2` files.
+- **Taxonomy:** KITTI Car/Truck/Pedestrian are scored as COCO car/truck/person. Van, Person_sitting, Cyclist, Tram, Misc, and DontCare become class-specific ignore regions (`iscrowd=1`). See `configs/kitti_taxonomy.json`.
+- **Protocol:** FP32, batch 1, score threshold 0.001, top-100 detections, pycocotools bbox evaluation. Latency runs from the decoded image in host memory to boxes on the CPU, with CUDA synchronization and 20 warm-up passes.
+
+## Evaluation matrix (mAP@[.50:.95], %)
+
+| Configuration | COCO val2017 (80 cls) | KITTI val (3 cls) |
 | --- | --- | --- |
-| YOLO11n, COCO pretrained, 640 px | Pending | Pending |
-| YOLO11s, COCO pretrained, 640 px | Pending | Pending |
-| Faster R-CNN MobileNetV3 320 FPN, COCO_V1 | Pending | Pending |
+| YOLO11n, 640 | 38.5 | 26.8 |
+| YOLO11s, 640 | 45.5 | 31.0 |
+| RT-DETR-L, 640 | 52.2 | 38.3 |
+| Faster R-CNN MobileNetV3 320 FPN | 23.1 | 16.1 |
+| Faster R-CNN R50-FPN-v2, 800 | 47.0 | 36.5 |
 
-The Windows bootstrap, environment report, and synthetic-input GPU smoke tests are implemented. They have not been run on the RTX 3060 Ti yet. See DESKTOP_SETUP.md for the handoff. Full evaluation scripts and dataset preparation remain pending.
+Ablations (`scripts/run_ablations.ps1`): RT-DETR aspect-preserving input on KITTI, YOLO at 1280 px on KITTI, and YOLO11s top-300 detections on COCO.
 
-## Metrics
+## Analyses performed
 
-Prioritize mAP@[0.50:0.95], AP50, per-class AP, latency/FPS, and peak GPU memory. Include object-size AP where supported. State evaluator conventions; do not compare different category sets or annotation protocols as if they were identical.
+1. Cross-dataset generalization by class, object size, occlusion, and box height.
+2. Speed–accuracy trade-off (latency, FPS, peak GPU memory).
+3. Architecture comparison: NMS vs NMS-free duplicates, score calibration, localization quality.
+4. Failure analysis at each model's best-F1 threshold, with rendered examples in `report/figures`.
 
-For latency, specify batch size, precision, warmup, GPU synchronization, repetitions, and whether preprocessing, transfers, and post-processing are included.
+## Not done / possible extensions
 
-## Required analyses
-
-1. Cross-dataset generalization: inspect performance by shared class and object scale, acknowledging annotation and dataset differences.
-2. Speed-accuracy tradeoffs: compare all configurations under documented timing conditions.
-
-Include failure examples with ground truth and predictions and explain false positives, missed objects, localization errors, and occlusion where supported by evidence.
-
-## Deliverables
-
-- Reproducible scripts, configurations, and command logs
-- Quantitative tables and selected failure figures
-- PDF report (6-10 pages) or PDF presentation (15-25 slides)
-- At least eight technical references: at least four original papers and two official repositories/framework documentation sources
+- Fine-tuning on KITTI (optional for the assignment).
+- FP16/TensorRT latency.
+- Running Ultralytics' own validator to measure the multi-label NMS effect on the YOLO COCO gap.

@@ -18,11 +18,8 @@ os.environ.setdefault("TORCH_HOME", str(ROOT / "checkpoints/torch"))
 def main():
     import numpy as np
     import torch
-    from torchvision.models.detection import (
-        FasterRCNN_MobileNet_V3_Large_320_FPN_Weights,
-        fasterrcnn_mobilenet_v3_large_320_fpn,
-    )
-    from ultralytics import YOLO
+    from torchvision.models import detection
+    from ultralytics import RTDETR, YOLO
 
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is required. Run scripts/check_environment.py --require-cuda first.")
@@ -40,8 +37,8 @@ def main():
         try:
             torch.cuda.reset_peak_memory_stats()
             with torch.inference_mode():
-                if config["backend"] == "ultralytics":
-                    model = YOLO(config["checkpoint"])
+                if config["backend"].startswith("ultralytics"):
+                    model = (RTDETR if config["backend"] == "ultralytics-rtdetr" else YOLO)(config["checkpoint"])
                     prediction = model.predict(np.zeros((480, 640, 3), dtype=np.uint8),
                                                imgsz=config["image_size"], device=0,
                                                verbose=False, save=False)
@@ -49,9 +46,9 @@ def main():
                     assert prediction[0].boxes.xyxy.shape[-1] == 4
                     assert next(model.model.parameters()).is_cuda
                 else:
-                    model = fasterrcnn_mobilenet_v3_large_320_fpn(
-                        weights=FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1
-                    ).eval().cuda()
+                    weights_enum, weights_name = config["checkpoint"].split(".")
+                    weights = getattr(detection, weights_enum)[weights_name]
+                    model = getattr(detection, config["builder"])(weights=weights).eval().cuda()
                     prediction = model([torch.zeros((3, 480, 640), device="cuda")])
                     assert prediction[0]["boxes"].shape[-1] == 4
                     assert prediction[0]["boxes"].is_cuda

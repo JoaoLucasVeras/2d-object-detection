@@ -1,0 +1,51 @@
+{
+  "timestamp_utc": "2026-10-30T18:59:28.333018+00:00",
+  "command": "python.exe scripts/run_inference.py --model rtdetr_l --dataset kitti --pad-square",
+  "model": {
+    "id": "rtdetr_l",
+    "family": "DETR (RT-DETR)",
+    "paradigm": "query-based transformer, Hungarian-trained, NMS-free",
+    "backend": "ultralytics-rtdetr",
+    "checkpoint": "rtdetr-l.pt",
+    "image_size": 640,
+    "resize": "stretched to 640x640 (Ultralytics RT-DETR predictor uses scale_fill); input pre-padded to square (aspect preserved)"
+  },
+  "dataset": "kitti",
+  "num_images": 1496,
+  "settings": {
+    "precision": "fp32",
+    "batch_size": 1,
+    "score_threshold": 0.001,
+    "max_detections_per_image": 100,
+    "nms_iou": {
+      "ultralytics": 0.7,
+      "torchvision": 0.5,
+      "ultralytics-rtdetr": "none (NMS-free)"
+    },
+    "note": "Low score threshold and top-100 detections follow the standard COCO mAP protocol. NMS IoU values are each framework's evaluation defaults.",
+    "warmup_iterations": 20
+  },
+  "timing_boundary": "decoded uint8 image in host memory -> boxes on CPU (pre-process, H2D, network, post-process/NMS); excludes disk read and image decode",
+  "latency_ms": {
+    "mean": 48.98,
+    "median": 48.35,
+    "p90": 53.82,
+    "std": 6.57
+  },
+  "fps_from_mean": 20.4,
+  "peak_gpu_memory_allocated_mib": 237.5,
+  "peak_gpu_memory_reserved_mib": 302.0,
+  "num_predictions": 149600,
+  "predictions_file": "predictions/kitti/rtdetr_l_padsq.json",
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "driver": "610.88",
+    "cuda_runtime": "12.6",
+    "cudnn": 91002,
+    "torch": "2.8.0+cu126",
+    "torchvision": "0.23.0+cu126",
+    "ultralytics": "8.3.200",
+    "python": "3.11.9",
+    "os": "Windows-10-10.0.26200-SP0"
+  }
+}

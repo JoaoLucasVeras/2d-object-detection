@@ -1,0 +1,193 @@
+{
+  "dataset": "kitti",
+  "model": "rtdetr_l",
+  "predictions_file": "predictions/kitti/rtdetr_l.json",
+  "evaluator": "pycocotools COCOeval bbox, maxDets=100, IoU 0.50:0.05:0.95; iscrowd/ignore regions excluded",
+  "all_classes": {
+    "AP": 38.32,
+    "AP50": 66.94,
+    "AP75": 38.84,
+    "AP_small": 30.26,
+    "AP_medium": 34.8,
+    "AP_large": 52.83,
+    "AR1": 24.49,
+    "AR10": 50.63,
+    "AR100": 52.86,
+    "AR_small": 49.47,
+    "AR_medium": 49.56,
+    "AR_large": 63.45,
+    "per_class": {
+      "person": {
+        "AP": 29.66,
+        "AP50": 66.14,
+        "num_gt": 921
+      },
+      "car": {
+        "AP": 51.57,
+        "AP50": 85.97,
+        "num_gt": 5716
+      },
+      "truck": {
+        "AP": 33.73,
+        "AP50": 48.72,
+        "num_gt": 223
+      }
+    }
+  },
+  "subsets": {
+    "occlusion_0_fully_visible": {
+      "AP": 46.15,
+      "AP50": 72.56,
+      "AR100": 63.55,
+      "per_class": {
+        "person": {
+          "AP": 40.19,
+          "AP50": 83.23,
+          "num_gt": 546
+        },
+        "car": {
+          "AP": 70.26,
+          "AP50": 96.6,
+          "num_gt": 2696
+        },
+        "truck": {
+          "AP": 28.02,
+          "AP50": 37.86,
+          "num_gt": 115
+        }
+      }
+    },
+    "occlusion_1_partly": {
+      "AP": 29.28,
+      "AP50": 59.28,
+      "AR100": 47.61,
+      "per_class": {
+        "person": {
+          "AP": 19.68,
+          "AP50": 54.22,
+          "num_gt": 229
+        },
+        "car": {
+          "AP": 46.4,
+          "AP50": 89.48,
+          "num_gt": 1649
+        },
+        "truck": {
+          "AP": 21.76,
+          "AP50": 34.13,
+          "num_gt": 54
+        }
+      }
+    },
+    "occlusion_2_largely": {
+      "AP": 9.46,
+      "AP50": 28.76,
+      "AR100": 29.82,
+      "per_class": {
+        "person": {
+          "AP": 3.6,
+          "AP50": 15.6,
+          "num_gt": 137
+        },
+        "car": {
+          "AP": 14.99,
+          "AP50": 54.31,
+          "num_gt": 1196
+        },
+        "truck": {
+          "AP": 9.79,
+          "AP50": 16.36,
+          "num_gt": 18
+        }
+      }
+    },
+    "height_lt25px": {
+      "AP": 20.79,
+      "AP50": 39.83,
+      "AR100": 33.02,
+      "per_class": {
+        "person": {
+          "AP": 0.06,
+          "AP50": 0.54,
+          "num_gt": 15
+        },
+        "car": {
+          "AP": 41.51,
+          "AP50": 79.11,
+          "num_gt": 799
+        },
+        "truck": {
+          "AP": null,
+          "AP50": null,
+          "num_gt": 0
+        }
+      }
+    },
+    "height_25_40px": {
+      "AP": 18.39,
+      "AP50": 32.49,
+      "AR100": 42.99,
+      "per_class": {
+        "person": {
+          "AP": 0.61,
+          "AP50": 1.92,
+          "num_gt": 48
+        },
+        "car": {
+          "AP": 46.78,
+          "AP50": 83.69,
+          "num_gt": 1490
+        },
+        "truck": {
+          "AP": 7.79,
+          "AP50": 11.87,
+          "num_gt": 70
+        }
+      }
+    },
+    "height_ge40px": {
+      "AP": 41.33,
+      "AP50": 70.32,
+      "AR100": 55.12,
+      "per_class": {
+        "person": {
+          "AP": 31.3,
+          "AP50": 69.34,
+          "num_gt": 858
+        },
+        "car": {
+          "AP": 54.51,
+          "AP50": 86.87,
+          "num_gt": 3427
+        },
+        "truck": {
+          "AP": 38.19,
+          "AP50": 54.77,
+          "num_gt": 153
+        }
+      }
+    },
+    "kitti_moderate": {
+      "AP": 42.83,
+      "AP50": 71.69,
+      "AR100": 59.14,
+      "per_class": {
+        "person": {
+          "AP": 36.31,
+          "AP50": 78.48,
+          "num_gt": 743
+        },
+        "car": {
+          "AP": 63.14,
+          "AP50": 95.72,
+          "num_gt": 3160
+        },
+        "truck": {
+          "AP": 29.03,
+          "AP50": 40.88,
+          "num_gt": 149
+        }
+      }
+    }
+  }
+}

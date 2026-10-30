@@ -1,8 +1,26 @@
 {
   "models": [
-    {"id": "yolo11n", "family": "YOLO", "backend": "ultralytics", "checkpoint": "yolo11n.pt", "image_size": 640},
-    {"id": "yolo11s", "family": "YOLO", "backend": "ultralytics", "checkpoint": "yolo11s.pt", "image_size": 640},
-    {"id": "fasterrcnn_mobilenet320", "family": "Faster R-CNN", "backend": "torchvision", "checkpoint": "FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1", "image_size": 320}
+    {"id": "yolo11n", "family": "YOLO", "paradigm": "one-stage, anchor-free, NMS", "backend": "ultralytics", "checkpoint": "yolo11n.pt", "image_size": 640,
+     "resize": "letterbox long side to 640, minimal stride-32 padding"},
+    {"id": "yolo11s", "family": "YOLO", "paradigm": "one-stage, anchor-free, NMS", "backend": "ultralytics", "checkpoint": "yolo11s.pt", "image_size": 640,
+     "resize": "letterbox long side to 640, minimal stride-32 padding"},
+    {"id": "rtdetr_l", "family": "DETR (RT-DETR)", "paradigm": "query-based transformer, Hungarian-trained, NMS-free", "backend": "ultralytics-rtdetr", "checkpoint": "rtdetr-l.pt", "image_size": 640,
+     "resize": "stretched to 640x640 (Ultralytics RT-DETR predictor uses scale_fill)"},
+    {"id": "frcnn_mbv3_320", "family": "Faster R-CNN", "paradigm": "two-stage, anchor-based, NMS", "backend": "torchvision", "checkpoint": "FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1", "builder": "fasterrcnn_mobilenet_v3_large_320_fpn", "image_size": 320,
+     "resize": "short side 320, long side capped at 640"},
+    {"id": "frcnn_r50_v2", "family": "Faster R-CNN", "paradigm": "two-stage, anchor-based, NMS", "backend": "torchvision", "checkpoint": "FasterRCNN_ResNet50_FPN_V2_Weights.COCO_V1", "builder": "fasterrcnn_resnet50_fpn_v2", "image_size": 800,
+     "resize": "short side 800, long side capped at 1333"}
   ],
-  "status": "Starter configurations; full evaluation settings and label mapping remain pending."
+  "inference": {
+    "precision": "fp32",
+    "batch_size": 1,
+    "score_threshold": 0.001,
+    "max_detections_per_image": 100,
+    "nms_iou": {"ultralytics": 0.7, "torchvision": 0.5, "ultralytics-rtdetr": "none (NMS-free)"},
+    "note": "Low score threshold and top-100 detections follow the standard COCO mAP protocol. NMS IoU values are each framework's evaluation defaults."
+  },
+  "reference_coco_val_map": {
+    "yolo11n": 39.5, "yolo11s": 47.0, "rtdetr_l": 53.0, "frcnn_mbv3_320": 22.8, "frcnn_r50_v2": 46.7,
+    "source": "Ultralytics YOLO11/RT-DETR docs and torchvision model docs (published numbers, used only as a sanity check)"
+  }
 }

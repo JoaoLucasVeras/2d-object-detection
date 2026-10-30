@@ -1,0 +1,17 @@
+{
+  "description": "Mapping from KITTI 2D object labels to the COCO categories predicted by every model. 'evaluate' classes are scored; 'ignore_for' classes become iscrowd=1 regions for the listed COCO categories, so detections inside them are neither true nor false positives.",
+  "evaluated_coco_categories": {"1": "person", "3": "car", "8": "truck"},
+  "kitti_to_coco": {
+    "Car":            {"evaluate": 3},
+    "Truck":          {"evaluate": 8},
+    "Pedestrian":     {"evaluate": 1},
+    "Van":            {"ignore_for": [3, 8], "reason": "COCO has no van class; detectors legitimately call vans car or truck (KITTI's own protocol also ignores Van when scoring Car)"},
+    "Person_sitting": {"ignore_for": [1], "reason": "A person in COCO; KITTI excludes it from Pedestrian"},
+    "Cyclist":        {"ignore_for": [1], "reason": "COCO detectors box the rider as person and the bike as bicycle; neither matches a KITTI Cyclist box"},
+    "Tram":           {"ignore_for": [1, 3, 8], "reason": "Closest COCO class is train, which is not evaluated"},
+    "Misc":           {"ignore_for": [1, 3, 8], "reason": "Unspecified objects (trailers, segways, ...)"},
+    "DontCare":       {"ignore_for": [1, 3, 8], "reason": "Unlabeled regions per the KITTI devkit"}
+  },
+  "area": "Box area w*h in original pixels (COCO uses mask area, so KITTI 'small/medium/large' buckets are slightly shifted toward larger objects)",
+  "split": "Ultralytics KITTI val split (1,496 images drawn from the official KITTI 2D object training set), with the official KITTI label_2 files"
+}
