@@ -2,6 +2,18 @@
 
 Track A experimental project for CMPE 249.
 
+## Start on the GPU desktop
+
+See [desktop setup](docs/DESKTOP_SETUP.md) for prerequisites and troubleshooting.
+
+```powershell
+git clone https://github.com/JoaoLucasVeras/2d-object-detection-evaluation.git
+cd 2d-object-detection-evaluation
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1
+```
+
+This installs the project environment, verifies CUDA and GPU NMS, and smoke-tests three pretrained detectors. Python 3.11 (64-bit), Git, and a working NVIDIA driver must already be installed.
+
 ## Research question
 
 How do pretrained object detectors compare in accuracy and inference speed, and how well do they transfer from everyday images to driving scenes?
@@ -14,7 +26,7 @@ How do pretrained object detectors compare in accuracy and inference speed, and 
 - Use pretrained checkpoints; fine-tuning is optional.
 - Target hardware: NVIDIA GeForce RTX 3060 Ti. GPU execution is not yet verified.
 
-Model configurations, checkpoints, datasets, and splits remain to be finalized after a GPU smoke test. COCO validation and KITTI are candidate datasets.
+Starter configurations are YOLO11 nano, YOLO11 small, and Faster R-CNN MobileNetV3 320 FPN; see `configs/models.json`. These meet the model-count and family-count requirements. GPU compatibility remains to be verified on the desktop. COCO validation and KITTI are candidate datasets; splits and class mappings remain pending.
 
 ## Project layout
 
@@ -44,4 +56,4 @@ The submission also needs at least eight credible technical references, includin
 
 ## Status
 
-Planning stage. No models have been evaluated and no experimental results are claimed.
+Desktop bootstrap and GPU smoke-test scripts are prepared. Dataset evaluation is not yet implemented. No models have been evaluated and no experimental results are claimed.

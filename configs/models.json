@@ -1,0 +1,8 @@
+{
+  "models": [
+    {"id": "yolo11n", "family": "YOLO", "backend": "ultralytics", "checkpoint": "yolo11n.pt", "image_size": 640},
+    {"id": "yolo11s", "family": "YOLO", "backend": "ultralytics", "checkpoint": "yolo11s.pt", "image_size": 640},
+    {"id": "fasterrcnn_mobilenet320", "family": "Faster R-CNN", "backend": "torchvision", "checkpoint": "FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1", "image_size": 320}
+  ],
+  "status": "Starter configurations; full evaluation settings and label mapping remain pending."
+}

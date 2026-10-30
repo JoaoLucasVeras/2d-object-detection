@@ -31,5 +31,6 @@ predictions/
 
 # Local scratch and OS files
 tmp/
+results/local/
 .DS_Store
 Thumbs.db

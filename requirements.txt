@@ -1,0 +1,9 @@
+# Install CUDA PyTorch first using scripts/setup_windows.ps1.
+torch==2.8.0
+torchvision==0.23.0
+ultralytics==8.3.200
+numpy==2.2.6
+Pillow==11.3.0
+PyYAML==6.0.2
+matplotlib==3.10.6
+pycocotools==2.0.10

@@ -3,7 +3,7 @@
 ## Decisions pending
 
 - Confirm GPU access, available disk space, and software environment.
-- Select three model configurations across at least two families.
+- Verify starter configurations: YOLO11n, YOLO11s, and Faster R-CNN MobileNetV3 320 FPN (two families).
 - Finalize datasets, labeled evaluation splits, and any fixed subsets.
 - Define shared categories, taxonomy mappings, and ignore policies before evaluation.
 
@@ -11,9 +11,11 @@
 
 | Configuration | Dataset/domain 1 | Dataset/domain 2 |
 | --- | --- | --- |
-| Model configuration 1 (pending) | Pending | Pending |
-| Model configuration 2 (pending) | Pending | Pending |
-| Model configuration 3 (pending) | Pending | Pending |
+| YOLO11n, COCO pretrained, 640 px | Pending | Pending |
+| YOLO11s, COCO pretrained, 640 px | Pending | Pending |
+| Faster R-CNN MobileNetV3 320 FPN, COCO_V1 | Pending | Pending |
+
+The Windows bootstrap, environment report, and synthetic-input GPU smoke tests are implemented. They have not been run on the RTX 3060 Ti yet. See DESKTOP_SETUP.md for the handoff. Full evaluation scripts and dataset preparation remain pending.
 
 ## Metrics
 
