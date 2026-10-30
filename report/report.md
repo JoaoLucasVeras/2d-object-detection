@@ -1,6 +1,6 @@
 # Pretrained 2D Object Detectors from COCO to KITTI: Accuracy, Speed, and Domain Shift
 
-<p class="subtitle">CMPE 249 Homework — Track A (Experimental). João Lucas Veras. Code, configurations, and command log: <a href="https://github.com/JoaoLucasVeras/2d-object-detection-evaluation">github.com/JoaoLucasVeras/2d-object-detection-evaluation</a> (branch <code>track-a-evaluation</code>).</p>
+<p class="subtitle">CMPE 249 Homework — Track A (Experimental). João Lucas Veras. Code, configurations, and command log: <a href="https://github.com/JoaoLucasVeras/2d-object-detection-evaluation">github.com/JoaoLucasVeras/2d-object-detection-evaluation</a> (branch <code>main</code>).</p>
 
 ## 1. Goal and summary
 
