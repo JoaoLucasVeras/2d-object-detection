@@ -32,6 +32,8 @@ Ablations (`scripts/run_ablations.ps1`): RT-DETR aspect-preserving input on KITT
 
 ## Not done / possible extensions
 
+Report review (2026-10-31): clarified custom COCO-style KITTI scoring and ignore matching, corrected speed/accuracy dominance claims, removed unsupported numerical truck-to-bus/train explanations, distinguished hypotheses from measurements, and expanded linked primary references. Saved experimental metrics were not changed. Final report rendering and layout checks accompany this editorial revision.
+
 - Fine-tuning on KITTI (optional for the assignment).
 - FP16/TensorRT latency.
 - Running Ultralytics' own validator to measure the multi-label NMS effect on the YOLO COCO gap.

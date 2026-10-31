@@ -6,14 +6,14 @@
 
 **Question.** How do modern pretrained detectors from three families compare in accuracy, latency, and memory, and how well do COCO-trained models transfer to autonomous-driving images without retraining?
 
-I evaluated **five COCO-pretrained configurations from three detector families**: YOLO11n and YOLO11s (one-stage, anchor-free), RT-DETR-L (query-based transformer, NMS-free), and Faster R-CNN with a MobileNetV3-320 or ResNet-50-FPN-v2 backbone (two-stage, anchor-based). Each one ran on **COCO val2017 (5,000 images)** and on a **KITTI 2D-object validation split (1,496 images)** on an RTX 3060 Ti. I ran every number in this report myself. Predictions were scored with the official COCO evaluator (pycocotools). Latency was measured per image with CUDA synchronization.
+I evaluated **five COCO-pretrained configurations from three detector families**: YOLO11n and YOLO11s (one-stage, anchor-free), RT-DETR-L (query-based transformer, NMS-free), and Faster R-CNN with a MobileNetV3-320 or ResNet-50-FPN-v2 backbone (two-stage, anchor-based). Each configuration ran on **COCO val2017 (5,000 images)** and a **KITTI validation subset (1,496 images)** on an RTX 3060 Ti, without fine-tuning. Ten main experiments and four ablations are documented in the saved run records. Predictions were scored with pycocotools. KITTI results use the study's mapped, COCO-style evaluation protocol, rather than official KITTI leaderboard scoring.
 
 **Main findings.**
 
-1. My COCO numbers reproduce the published ones to within 0.3–1.5 AP (Table 2). The detection budget explains only 0.1 AP of the YOLO gap (Section 5.4). Source inspection points to multi-label NMS in Ultralytics' validator as the likely remainder.
-2. Moving to KITTI costs 12.6–15.3 AP on the three shared classes. The loss is very uneven: **car AP is unchanged or higher**, **person AP roughly halves**, and **truck AP collapses** because many KITTI trucks are predicted as COCO *bus* or *train*. That is largely a taxonomy effect rather than a missed object.
-3. On KITTI's 1242×375 frames, the nominal "640" input leaves YOLO only 640×193 pixels of image. Running YOLO at 1280 px raises KITTI AP by 4.6–6.3 points for about 2 ms, and **YOLO11n at 1280 beats YOLO11s at 640**. RT-DETR's stretched input is *not* the reason for its small-object lead: preserving the aspect ratio improves its small-object AP.
-4. Latency at batch 1 is overhead-bound. YOLO11n and YOLO11s differ by less than 1 ms, while two-stage Faster R-CNN is the slowest for its accuracy. RT-DETR-L gives the best accuracy on both datasets at about 21 FPS.
+1. Measured COCO accuracy differs from the published reference values by about 0.25–1.49 AP (Table 2). A larger detection budget recovers 0.14 AP for YOLO11s; other validator differences remain unquantified.
+2. Shared-class AP decreases by about 13–15 points for four configurations, and 4.45 for the weaker MobileNet baseline. **Cars generally retain accuracy; pedestrians and trucks lose AP.** Image distribution and annotation differences both affect this comparison.
+3. Increasing YOLO input size to 1280 raises KITTI AP by 4.6–6.3 points for about 2 ms. YOLO11n at 1280 is more accurate, but slower, than YOLO11s at 640. Preserving RT-DETR's input aspect ratio improves small-object AP but decreases overall AP.
+4. RT-DETR-L provides the highest AP on both datasets at roughly 21–22 FPS. YOLO offers faster operating points. These compare complete configurations, including their different backbones, resize rules, and implementations.
 
 ## 2. Models and datasets
 
@@ -27,7 +27,7 @@ I evaluated **five COCO-pretrained configurations from three detector families**
 | FRCNN-MBv3-320 | Faster R-CNN; two-stage, anchor-based RPN + RoI head, NMS | `FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1` | torchvision 0.23 | short side 320, long ≤ 640 |
 | FRCNN-R50-v2 | Faster R-CNN; ResNet-50-FPN, improved v2 recipe | `FasterRCNN_ResNet50_FPN_V2_Weights.COCO_V1` | torchvision 0.23 | short side 800, long ≤ 1333 |
 
-The two YOLO sizes count as one family. The required "≥ 3 configurations from ≥ 2 families" is met three times over, by three families (YOLO, DETR, R-CNN).
+The five configurations cover three families. Faster R-CNN uses region proposals and per-region refinement [1], with multi-scale FPN features [2]. Its backbones follow MobileNetV3 [8] and torchvision's improved ResNet recipe [9,13]. DETR uses object-query set prediction [3], extended for efficiency by RT-DETR [4]. The original YOLO paper [5] supplies historical context; YOLO11 implementation details and benchmark values come from the official documentation and versioned code [12].
 
 **COCO val2017** [6]: 5,000 images, 80 classes, official `instances_val2017.json`.
 
@@ -42,25 +42,25 @@ The two YOLO sizes count as one family. The required "≥ 3 configurations from 
 | Person_sitting, Cyclist | ignore region for person (a COCO model correctly boxes a cyclist's rider as *person* and the bike as *bicycle*) |
 | Tram, Misc, DontCare | ignore region for all three classes |
 
-Ignore regions are encoded as COCO `iscrowd=1` annotations. pycocotools then neither rewards nor penalizes detections that fall inside them. All other COCO classes predicted on KITTI are discarded. For an apples-to-apples comparison I also re-scored COCO on **the same three classes only** ("COCO-3").
+Ignore regions are encoded as COCO `iscrowd=1` annotations. Detections matched to them under COCOeval's crowd rules are excluded from scoring; mere overlap does not automatically exclude a detection [14]. Other predicted categories do not contribute to KITTI's three-class scores. COCO is also re-scored on **the same three classes** ("COCO-3"). This aligns the label set, but cannot remove differences in annotation, viewpoints, scale distributions, or sampling. KITTI area groups use box area, whereas COCO annotations can use segmentation area. The mapped KITTI results are **COCO-style AP, not official KITTI AP_R40**.
 
 ## 3. Experimental setup and hardware
 
 | Item | Value |
 |---|---|
-| GPU / CPU / RAM | NVIDIA GeForce RTX 3060 Ti 8 GB (driver 610.88) / AMD Ryzen 7 3700X / 32 GB |
+| GPU | NVIDIA GeForce RTX 3060 Ti 8 GB; saved driver version 610.88 |
 | Software | Windows 11, Python 3.11.9, PyTorch 2.8.0+cu126, torchvision 0.23.0, Ultralytics 8.3.200, pycocotools 2.0.10, cuDNN 9.10 |
 | Precision / batch | FP32, batch size 1 |
 | Score threshold | 0.001 (standard for mAP) |
 | NMS IoU | 0.7 (Ultralytics YOLO default), 0.5 (torchvision default), none (RT-DETR) |
-| Detections kept | top 100 per image by score, for all models |
+| Detections kept | Global top 100 per image by score; separate from COCOeval's per-category maxDets limit |
 | Evaluator | pycocotools `COCOeval` bbox, IoU 0.50:0.05:0.95, maxDets 100 |
-| Latency | 20 warm-up passes; then per image: `cuda.synchronize` → time from decoded uint8 image in host memory to boxes on CPU (pre-processing, H2D copy, network, post-processing/NMS). Disk read and JPEG/PNG decoding excluded. |
+| Latency | 20 warm-up passes; CUDA synchronization around decoded host-memory image → CPU boxes. Includes preprocessing, transfer, network, and framework post-processing/NMS. Excludes decoding, disk I/O, final wrapper sorting and JSON serialization. |
 | Memory | `torch.cuda.max_memory_allocated` over the run (PyTorch allocator, not whole-process) |
 
 ## 4. Commands and configuration
 
-Everything is driven by checked-in scripts. Configurations live in `configs/models.json` and `configs/kitti_taxonomy.json`. Each run writes a JSON record (`results/runs/*.json`) containing the exact command, settings, timing boundary, and software versions. Every executed command is appended with a timestamp to `results/command_log.txt`.
+Configurations live in `configs/models.json` and `configs/kitti_taxonomy.json`. Each inference run writes a JSON record (`results/runs/*.json`) with its command, settings, timing boundary, and environment. The main and ablation runners append experiment commands to `results/command_log.txt`. Saved metrics and logs document the desktop runs; the final report edit did not rerun GPU inference.
 
 ```
 powershell -ExecutionPolicy Bypass -File scripts/setup_windows.ps1   # venv, CUDA check, smoke test
@@ -95,7 +95,7 @@ powershell -File scripts/run_ablations.ps1    # Section 5.4
 | FRCNN-MBv3-320 | 16.1 | 34.5 | 14.1 | 0.2 | 9.3 | 38.6 | 26.8 | 29.6 | 33.8 | 121 |
 | FRCNN-R50-v2 | 36.5 | **67.2** | 37.4 | 25.5 | 33.7 | 48.6 | **55.8** | 62.6 | 16.0 | 442 |
 
-Per-class AP and the full metric set for every run are in `results/metrics/*.json`. All tables are regenerated by `scripts/summarize.py` into `results/summary.md`.
+Per-class AP and complete metrics are in `results/metrics/*.json`; `scripts/summarize.py` creates `results/summary.md`. AP averages precision across confidence rankings and IoU thresholds; it is not the fraction of objects detected. FPS is 1000 divided by mean per-image milliseconds, not concurrent video throughput. Published AP values are sanity-check references [12,13], not exact protocol reproductions. The two tables average different category sets, so their AP difference alone does not measure transfer.
 
 ### 5.1 Analysis 1 — Cross-dataset generalization
 
@@ -112,15 +112,15 @@ Per-class AP and the full metric set for every run are in `results/metrics/*.jso
 ![Per-class AP on COCO vs KITTI](figures/cross_domain_per_class.png)
 <p class="caption">Figure 1. Per-class AP on COCO (restricted to the shared classes) and on KITTI. Cars transfer; persons and trucks do not.</p>
 
-**Which classes degrade most?** The aggregate drop (−13 to −15 AP for the three stronger models) hides three different behaviors:
+**Which classes degrade most?** The roughly 13–15 point drop for four configurations hides different class behaviors:
 
-* **Car transfers well (Δ ≈ −1 to +6 AP).** KITTI cars are mostly unoccluded, mid-sized vehicles seen from a dash camera, an easy subset of COCO's car distribution. In COCO, 62% of car instances are *small* (< 32² px); in KITTI only 16% are.
-* **Person loses about half its AP (−27 to −32 AP), and this is not a scale effect.** KITTI pedestrians are mostly mid-sized (median box height 87 px; only 19% small, versus 40% in COCO). AP50 falls by about 19 points as well (YOLO11s 81.4 → 62.7, RT-DETR 85.8 → 66.1), so both recall and localization suffer. The likely causes are partial occlusion behind parked cars and sidewalk clutter. The failure counts support this: miss rate rises from 10–13% for fully visible objects to 54–64% for largely occluded ones, for the three stronger models. Annotation convention also contributes: KITTI pedestrian boxes are tight and exclude carried objects. That convention costs most at strict IoU thresholds, consistent with AP@[.50:.95] for person falling about 30 points while AP50 falls only about 19.
-* **Truck collapses (−10 to −16 AP), largely because of taxonomy.** For every KITTI truck I recorded the class of the highest-IoU prediction (score ≥ 0.3, IoU ≥ 0.5). Many were predicted as COCO **train** or **bus**: 75 of 223 for YOLO11s, 53 for RT-DETR, and 100 for FRCNN-R50-v2. These detections are spatially correct but labeled with a class that has no KITTI counterpart. COCO's *truck* is dominated by pickups and box trucks seen from the side. KITTI's *Truck* is mostly semi-trailers and delivery trucks seen from behind, which resemble the front or back of a bus or train.
+* **Car transfers relatively well.** Four configurations improve in car AP; R50-v2 decreases by 0.63 points. This demonstrates category-dependent transfer, without establishing which dataset is universally easier.
+* **Person loses substantial AP.** For YOLO11n/s, RT-DETR-L, and R50-v2, person AP decreases by approximately 27–32 points. AP50 also falls (YOLO11s 81.4 → 62.7; RT-DETR 85.8 → 66.1). The saved failure counts show increasing misses with occlusion, supporting occlusion as a relevant difficulty. They do not isolate its causal contribution from appearance and annotation differences.
+* **Truck AP decreases by about 10–17 points.** Vehicle appearance and category conventions are plausible contributors. The checked-in failure analyzer only classifies confusion among person/car/truck; it does not quantify truck-to-bus/train confusion. Consequently, no numerical claim about those unmeasured confusions is made here.
 
-**Which scales degrade most?** Comparing COCO-3 with KITTI on the same three classes: for YOLO11s, AP_S falls from 27.7 to 18.2 and AP_M from 55.6 to 29.0. For RT-DETR, AP_S changes from 33.8 to 30.3 and AP_M from 61.0 to 34.8. Medium objects lose the most in absolute terms, because the occluded pedestrians and trucks above are mostly medium-sized.
+**Which scales degrade most?** For YOLO11s, shared-class AP_S falls from 27.7 to 18.2 and AP_M from 55.6 to 29.0. For RT-DETR, AP_S changes from 33.8 to 30.3 and AP_M from 61.0 to 34.8. Medium objects lose more in absolute points. These are descriptive comparisons: category composition and area definitions differ, so scale has not been isolated as the cause.
 
-The KITTI-specific breakdowns (Figure 2) show monotonic degradation with occlusion for every model. Under KITTI's "moderate" filter (height ≥ 25 px, occlusion ≤ 1, truncation ≤ 0.3), RT-DETR-L scores 42.8, FRCNN-R50-v2 40.9, YOLO11s 35.6, YOLO11n 31.7, and FRCNN-MBv3-320 18.6 AP.
+The KITTI breakdowns (Figure 2) show declining AP across occlusion levels 0, 1, and 2. A **moderate-like filter** (height ≥25 px, occlusion ≤1, truncation ≤0.3) gives RT-DETR-L 42.8, R50-v2 40.9, YOLO11s 35.6, YOLO11n 31.7, and MobileNet 18.6 AP. These retain COCO-style scoring and are not official KITTI moderate benchmark scores [7,14].
 
 ![KITTI AP by occlusion and height](figures/kitti_occlusion_height.png)
 <p class="caption">Figure 2. KITTI AP for subsets by occlusion level (KITTI labels 0/1/2) and by box height. Objects outside each subset become ignore regions.</p>
@@ -130,17 +130,17 @@ The KITTI-specific breakdowns (Figure 2) show monotonic degradation with occlusi
 ![Speed-accuracy](figures/speed_accuracy.png)
 <p class="caption">Figure 3. Accuracy vs mean per-image latency on the RTX 3060 Ti (FP32, batch 1, end-to-end excluding decode). Color = family; marker = model size.</p>
 
-* **Batch-1 latency is overhead-bound for small models.** YOLO11s has about 3× the FLOPs of YOLO11n (21.5 vs 6.5 GFLOPs at 640 px, per Ultralytics) but costs only 0.9 ms more on COCO (18.4 vs 17.5 ms) and is *faster* on KITTI. Python pre/post-processing and kernel-launch overhead dominate. **YOLO11s therefore strictly dominates YOLO11n here** (+7 AP for ~1 ms).
-* **The two-stage design costs latency.** FRCNN-MBv3-320 runs at a tiny 320 px input yet takes 29.7 ms, more than either YOLO, because the RPN, RoI Align over the proposals (150 for this variant; 1,000 for R50), and per-class NMS add sequential stages. FRCNN-R50-v2 needs 78.5 ms and 672 MiB for 47.0 AP: it is 1.7× slower than RT-DETR-L, uses 2.8× more memory, and is 5 AP less accurate.
+* **YOLO11s trades a small measured cost for higher accuracy.** On COCO, it adds 6.98 AP over YOLO11n for 0.94 ms. On KITTI it is both more accurate and slightly faster in these runs. Without repeated independent runs, the small timing advantage should not be treated as a stable property. Profiling would be needed to establish whether CPU or kernel-launch overhead dominates.
+* **The tested Faster R-CNN configurations cost more time.** MobileNet takes 29.7 ms on COCO, more than either YOLO, while R50-v2 takes 78.5 ms and 672 MiB for 46.95 AP. R50-v2 is about 1.7 times slower than RT-DETR-L, with roughly 2.8 times its allocated memory and 5.29 less AP. Backbone, recipe, input size, and implementation vary together; this does not isolate the two-stage design's causal cost.
 * **RT-DETR-L is on the Pareto front** (52.2 AP, 47 ms). It costs about 2.6× YOLO11s's latency for +6.7 AP on COCO and +7.3 AP on KITTI.
-* **Latency depends on the dataset's image shape.** FRCNN-R50-v2 is faster on KITTI (62.6 ms) than on COCO (78.5 ms) because the 1333-px long-side cap shrinks KITTI frames to 1333×402 (0.54 MP) versus about 800×1066 (0.85 MP) for COCO. YOLO letterboxes KITTI to 640×224 (minimal stride-32 padding), whereas RT-DETR always processes 640×640.
+* **Image geometry also varies.** R50-v2 is faster on KITTI (62.6 ms) than COCO (78.5 ms). Its long-side cap gives approximately 1333×402 for a representative 1242×375 KITTI frame. YOLO instead has about 640×193 content plus stride padding, while RT-DETR processes 640×640. These differences help motivate the geometry ablation; they do not independently explain the full timing gap.
 
 ### 5.3 Analysis 3 — Architecture comparison: YOLO vs RT-DETR vs Faster R-CNN
 
-* **Post-processing and duplicates.** YOLO11 and Faster R-CNN predict dense, redundant candidates and rely on NMS. RT-DETR is trained with one-to-one Hungarian matching [3,4], so each object should be claimed by one query and NMS is unnecessary. The failure counts agree: at each model's best-F1 threshold on KITTI, RT-DETR produced **30 duplicate detections versus 86 for YOLO11s and 109 for YOLO11n**. FRCNN-R50-v2 (15) also has few duplicates, but only because its best threshold is a very high 0.9.
-* **Score calibration differs by family.** The F1-optimal thresholds were 0.35 (YOLO), 0.55 (RT-DETR), and 0.5–0.9 (Faster R-CNN). One shared confidence threshold, as is common in deployment, would therefore favor some families over others. This is why I compare failures at each model's own best-F1 operating point.
-* **Localization quality.** On KITTI, AP75/AP50 is 0.58 for RT-DETR, 0.56 for FRCNN-R50-v2, 0.53 for YOLO11s, and 0.41 for FRCNN-MBv3-320. *Localization* (0.1 ≤ IoU < 0.5 with a same-class object) is the largest false-positive type for every model. Its main source is the rows of overlapping parked cars typical of KITTI streets (Figure 4).
-* **Recall on hard objects.** FRCNN-R50-v2 has the highest AR100 on KITTI (55.8) and the best AP on largely occluded objects (14.3 vs 9.5 for RT-DETR). Its 1,000 RPN proposals and higher input resolution (1333×402 vs 640×193 for YOLO) retain more heavily occluded candidates.
+* **Post-processing and duplicates.** YOLO11 and Faster R-CNN use NMS. RT-DETR uses query-based set prediction and NMS-free inference [3,4,12]. At the selected KITTI thresholds it produces 30 duplicates versus 86 for YOLO11s and 109 for YOLO11n. R50-v2 produces 15. Threshold differences prevent interpreting these counts as a controlled architecture comparison.
+* **Score operating points differ.** Selected F1-optimal thresholds are 0.35 for YOLO, 0.55 for RT-DETR, and 0.5–0.9 for Faster R-CNN. Different confidence scales warrant model-specific thresholds. Formal score-calibration error was not measured.
+* **Localization quality.** KITTI AP75/AP50 is approximately 0.58 for RT-DETR, 0.56 for R50-v2, 0.53 for YOLO11s, and 0.41 for MobileNet. Localization error is the largest recorded false-positive category for every baseline; crowded parked cars illustrate one setting where it occurs (Figure 4).
+* **Hard-object performance.** R50-v2 leads in KITTI AR100 (55.8) and largely occluded subset AP (14.3 versus 9.5 for RT-DETR). Higher input resolution and proposal processing are possible contributors, but were not isolated experimentally.
 
 ### 5.4 Ablations: input geometry and detection budget
 
@@ -157,15 +157,15 @@ The KITTI-specific breakdowns (Figure 2) show monotonic degradation with occlusi
 | YOLO11s, top-100 detections (default) | COCO | 45.5 | 62.0 | 27.6 | 50.1 | 62.5 | 18.4 | 110 |
 | YOLO11s, top-300 detections | COCO | 45.7 | 62.3 | 27.8 | 50.2 | 62.5 | 17.9 | 110 |
 
-**Input resolution on wide frames (YOLO).** At 1280 px, a KITTI frame becomes 1280×387 instead of 640×193. Small-object AP rises from 18.2 to 32.8 for YOLO11s and from 12.4 to 21.9 for YOLO11n, while large-object AP barely moves. Latency rises only about 2 ms because the image is still thin, so at batch 1 the GPU stays overhead-bound. YOLO11n at 1280 (33.1 AP, 19.5 ms) beats YOLO11s at 640 (31.0 AP, 16.6 ms). On wide driving images, **input resolution is a cheaper lever than model size**.
+**Input resolution on wide frames (YOLO).** A representative KITTI frame contains about 1280×387 image pixels rather than 640×193 before padding. YOLO11s gains 4.56 AP overall and 14.54 small-object AP; YOLO11n gains 6.28 AP overall. Latency increases by 1.95 and 2.33 ms respectively. YOLO11n at 1280 is more accurate, but slower, than YOLO11s at 640. These results support testing input resolution alongside model size, rather than assuming one is always the better choice.
 
-**Stretching vs aspect preservation (RT-DETR).** Ultralytics' RT-DETR predictor resizes every image to 640×640 without preserving aspect ratio (`LetterBox(auto=False, scale_fill=True)` in `ultralytics/models/rtdetr/predict.py`). A 1242×375 KITTI frame is therefore squeezed horizontally by 0.52 and stretched vertically by 1.71. I expected this distortion, or the extra vertical pixels it creates, to explain RT-DETR's KITTI lead. The ablation contradicts that. Padding to a square first keeps proportions but leaves only 640×193 pixels of content, and it *raises* small-object AP (30.3 → 33.5) while lowering large-object AP (52.8 → 48.9), for −1.1 AP overall. RT-DETR's small-object advantage over YOLO11s at the same 640×193 content (33.5 vs 18.2) therefore comes from the model, not the resize. The stretch mainly helps large, nearby objects, plausibly because they then fill the 640×640 canvas in a way closer to COCO's object scale.
+**Stretching vs aspect preservation (RT-DETR).** `RTDETRPredictor.pre_transform` resizes to 640×640 with `scale_fill=True` [12]. Padding the original image to a square first preserves proportions after resizing. This increases small-object AP from 30.26 to 33.54, lowers large-object AP from 52.83 to 48.87, and lowers overall AP by 1.10. Thus stretching alone does not explain RT-DETR's small-object advantage. The experiment also changes padding and content geometry, so the remaining gap cannot be attributed solely to architecture.
 
 **Detection budget (COCO).** Keeping the top 300 detections per image instead of 100 changes YOLO11s from 45.51 to 45.65 AP. That covers only 0.1 of the 1.5-point gap to the published 47.0. A remaining protocol difference I verified in the source: Ultralytics' validator runs NMS with `multi_label=True` (`ultralytics/models/yolo/detect/val.py`), so one box can contribute a detection for several classes. The `predict()` path I used keeps one label per box. I did not run the validator, so the size of this effect is not measured.
 
 ## 6. Failure analysis
 
-For each model I picked the score threshold that maximizes F1 at IoU 0.5 and matched detections greedily to ground truth. I classified each unmatched detection as a *duplicate*, *class confusion*, *localization* error, or *background* false positive, and split misses by box height and occlusion (`results/failure_analysis_kitti.json`).
+For each model, `scripts/failure_analysis.py` searches thresholds 0.05–0.95 in 0.05 steps for the highest F1 at IoU 0.5 on this same validation set. Greedy matching labels unmatched detections as duplicate, evaluated-class confusion, localization error, or background; ignored-region matches are excluded. Misses are split by height and occlusion. These are descriptive validation operating points, not independently validated deployment thresholds. Counts depend on both the detector and the chosen threshold.
 
 | Model (KITTI) | Thr | F1 | Background FP | Localization FP | Duplicate | Class conf. | Miss rate h<25 / 25–40 / 40–100 / ≥100 px |
 |---|---|---|---|---|---|---|---|
@@ -176,39 +176,41 @@ For each model I picked the score threshold that maximizes F1 at IoU 0.5 and mat
 | FRCNN-R50-v2 | 0.90 | 0.81 | 310 | 593 | 15 | 5 | 0.24 / 0.26 / 0.25 / 0.15 |
 
 ![Failure example](figures/failure_kitti_yolo11s_000146.jpg)
-<p class="caption">Figure 4. YOLO11s on KITTI image 000146 (threshold 0.35). Blue = true positive; thick bright green with "MISS" = missed ground truth; yellow = localization error; red = background FP; gray = ignore region. Failure modes: (1) a row of parked cars occluding one another produces merged or shifted boxes (yellow) and misses; (2) distant cars under 25 px tall in the vanishing-point region are missed; (3) the truck in the center is detected as *truck* but only at score 0.23, below the operating threshold; (4) a narrow pedestrian beside the parked cars (right of center) is missed, and a small object by a doorway is detected as a person (red).</p>
+<p class="caption">Figure 4. Selected difficult KITTI image 000146, YOLO11s threshold 0.35. Blue/orange = true positive; bright green MISS = unmatched ground truth; yellow = localization error; red = background FP; gray = ignored region. Crowded cars and distant objects illustrate failure cases. This is a selected high-error image, not a random sample or an estimate of error frequency.</p>
 
 **Failure modes, with evidence.**
 
-1. **Small, distant objects.** Miss rate for objects under 25 px tall is 45–96% for YOLO and FRCNN-MBv3, which see KITTI at 640×193, versus 24–29% for FRCNN-R50-v2 and RT-DETR. Running YOLO at 1280 px closes most of this gap (Section 5.4).
+1. **Small, distant objects.** Miss rates below 25 px height are 45–64% for YOLO, 96% for MobileNet, and 24–29% for R50-v2 and RT-DETR. Higher-resolution YOLO improves small-object AP, but no corresponding high-resolution miss-rate analysis was saved.
 2. **Occlusion.** Miss rate grows from 10–20% (fully visible) to 54–72% (largely occluded) for every model except FRCNN-MBv3-320, which is worse throughout.
-3. **Crowded parked cars.** These cause localization errors, the largest FP category for all five models.
-4. **Taxonomy mismatch for trucks.** Detections are spatially correct but labeled bus or train, as quantified in Section 5.1.
+3. **Crowded parked cars.** The figure illustrates localization errors, which are the largest recorded FP category for every baseline; their causes were not quantified by scene type.
+4. **Truck errors.** Truck AP falls across configurations. Appearance and taxonomy mismatch are plausible contributors, but bus/train confusion was not quantified by the saved analyzer.
 5. **Background false positives.** These are 21–34% of false positives at the operating point (for example, the object by the doorway predicted as a person in Figure 4). I did not categorize them further, so their specific causes are not quantified here.
-6. **Input resolution.** FRCNN-MBv3-320 at 320 px misses 96% of objects under 25 px tall, so small-object AP is near zero on both datasets (2.8 COCO, 0.2 KITTI).
+6. **Input resolution.** FRCNN-MBv3-320 misses 96% of objects under 25 px tall at the selected threshold, and small-object AP is near zero (2.8 COCO, 0.2 KITTI). This association does not isolate resolution from backbone and checkpoint effects.
 
 ## 7. Conclusions
 
-* My measured COCO accuracy matches published results (≤ 1.5 AP difference; for YOLO the remaining gap is a validator protocol difference, not the detection budget). The pipeline can therefore be trusted for the cross-domain comparison.
-* Zero-shot transfer from COCO to KITTI costs about 13–15 AP. Nearly all of the loss comes from **person** (occlusion, annotation convention) and **truck** (taxonomy: KITTI trucks predicted as bus or train). Cars transfer with no loss. A per-class view is essential; the aggregate number would suggest uniform degradation that does not exist.
-* On wide driving frames, **input resolution** is a first-order factor for YOLO: doubling it adds 4.6–6.3 AP for about 2 ms, more than moving from the n to the s model. A nominal "640" input hides very different preprocessing across frameworks (letterbox vs stretch). The ablation shows that RT-DETR's stretch helps large objects but is not the source of its small-object lead.
-* For this GPU at batch 1, **RT-DETR-L** is the most accurate configuration (38.3 KITTI AP at about 22 FPS). **YOLO11s at 1280 px** (35.6 AP at about 54 FPS) is the best choice above 50 FPS. At equal input size YOLO11s dominates YOLO11n. Faster R-CNN R50-v2 has the best recall on occluded objects but is the slowest and most memory-hungry.
-* **Limitations and next steps.** I did no fine-tuning, so KITTI fine-tuning (or a class-agnostic vehicle mapping that counts bus/train/truck as one class) would separate taxonomy loss from true domain shift. I used FP32 only; TensorRT/FP16 could change the latency ranking and was not tested. The 1,496-image KITTI split has only 223 trucks, so truck AP has high variance.
+* COCO AP is within approximately 1.5 points of the published values. This is a useful sanity check, but protocol differences remain. The detection-budget experiment does not resolve the remaining YOLO gap; the native validator is a future check.
+* Shared-class transfer is uneven: pedestrian and truck AP decline while cars generally retain performance. The weaker MobileNet model's smaller aggregate drop does not establish greater robustness from its low starting AP. Annotation and visual-distribution changes are intertwined.
+* Increasing YOLO resolution adds 4.56–6.28 AP on KITTI with about 2 ms additional measured latency. RT-DETR's aspect-preservation experiment shows that stretching alone does not explain its small-object lead. Full preprocessing settings must accompany model names.
+* RT-DETR-L is most accurate here. Among tested KITTI configurations above 50 FPS, YOLO11s at 1280 has the highest AP (35.58). R50-v2 leads in KITTI recall and largely occluded subset AP, but costs more time and memory. These are configuration-specific findings, not hardware-independent rankings.
+* **Limitations.** Only one GPU, FP32, batch 1, and one full timing run per configuration were evaluated. There are no repeated-run confidence intervals or independent threshold-tuning data. The KITTI mapping is custom and has only 223 scored trucks. Predictions and datasets remain local to the desktop; the checked-in metrics cannot be independently recomputed without those artifacts or rerunning inference. Fine-tuning, repeated timing, native validation, and FP16/TensorRT tests are useful extensions.
+
+**AI assistance and reproducibility.** Codex assisted with setup, code review, interpretation, reference checks, and report editing. Measurements come from the saved desktop artifacts; no new results were generated during editing. Preserve the dataset files, checkpoint versions, environment freeze, and repository revision when reproducing the work. The repository is private: grant the instructor access or include a ZIP of scripts, configurations, and logs with the PDF.
 
 ## 8. References
 
-1. S. Ren, K. He, R. Girshick, J. Sun. *Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks.* NeurIPS 2015.
-2. T.-Y. Lin, P. Dollár, R. Girshick, K. He, B. Hariharan, S. Belongie. *Feature Pyramid Networks for Object Detection.* CVPR 2017.
-3. N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, S. Zagoruyko. *End-to-End Object Detection with Transformers (DETR).* ECCV 2020.
-4. Y. Zhao, W. Lv, S. Xu, et al. *DETRs Beat YOLOs on Real-time Object Detection (RT-DETR).* CVPR 2024.
-5. J. Redmon, S. Divvala, R. Girshick, A. Farhadi. *You Only Look Once: Unified, Real-Time Object Detection.* CVPR 2016.
-6. T.-Y. Lin, M. Maire, S. Belongie, et al. *Microsoft COCO: Common Objects in Context.* ECCV 2014.
-7. A. Geiger, P. Lenz, R. Urtasun. *Are we ready for Autonomous Driving? The KITTI Vision Benchmark Suite.* CVPR 2012.
-8. A. Howard, M. Sandler, G. Chu, et al. *Searching for MobileNetV3.* ICCV 2019.
-9. Y. Li, S. Xie, X. Chen, P. Dollár, K. He, R. Girshick. *Benchmarking Detection Transfer Learning with Vision Transformers* (basis of torchvision's Faster R-CNN v2 recipe). arXiv:2111.11429, 2021.
-10. C. Feng, Y. Zhong, Y. Gao, M. Scott, W. Huang. *TOOD: Task-aligned One-stage Object Detection* (assigner used by YOLOv8/YOLO11). ICCV 2021.
-11. X. Li, W. Wang, L. Wu, et al. *Generalized Focal Loss* (Distribution Focal Loss used in YOLO11's box head). NeurIPS 2020.
-12. Ultralytics. *YOLO11 and RT-DETR documentation* and source (`ultralytics/models/rtdetr/predict.py`), v8.3.200. https://docs.ultralytics.com, https://github.com/ultralytics/ultralytics
-13. PyTorch. *torchvision.models.detection documentation* (Faster R-CNN weights and COCO metrics). https://pytorch.org/vision/stable/models.html
-14. COCO API (pycocotools) — `cocoeval.py` evaluation protocol. https://github.com/cocodataset/cocoapi
-15. K. Liu. *DeepDataMiningLearning — ngdet tutorial* (course starting point). https://github.com/lkk688/DeepDataMiningLearning
+1. S. Ren, K. He, R. Girshick, and J. Sun. *Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks.* NeurIPS, 2015. [Original paper](https://arxiv.org/abs/1506.01497).
+2. T.-Y. Lin, P. Dollár, R. Girshick, K. He, B. Hariharan, and S. Belongie. *Feature Pyramid Networks for Object Detection.* CVPR, 2017. [Original paper](https://arxiv.org/abs/1612.03144).
+3. N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, and S. Zagoruyko. *End-to-End Object Detection with Transformers.* ECCV, 2020. [Original paper](https://arxiv.org/abs/2005.12872).
+4. Y. Zhao, W. Lv, S. Xu, J. Wei, G. Wang, Q. Dang, Y. Liu, and J. Chen. *DETRs Beat YOLOs on Real-time Object Detection.* CVPR, 2024. [Original paper](https://arxiv.org/abs/2304.08069).
+5. J. Redmon, S. Divvala, R. Girshick, and A. Farhadi. *You Only Look Once: Unified, Real-Time Object Detection.* CVPR, 2016. Historical YOLO-family context, not the YOLO11 implementation reference. [Original paper](https://arxiv.org/abs/1506.02640).
+6. T.-Y. Lin et al. *Microsoft COCO: Common Objects in Context.* ECCV, 2014. [Original paper](https://arxiv.org/abs/1405.0312).
+7. A. Geiger, P. Lenz, and R. Urtasun. *Are we ready for Autonomous Driving? The KITTI Vision Benchmark Suite.* CVPR, 2012. [Original paper](https://www.cvlibs.net/publications/Geiger2012CVPR.pdf); [official evaluation protocol](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d).
+8. A. Howard et al. *Searching for MobileNetV3.* ICCV, 2019. [Original paper](https://arxiv.org/abs/1905.02244).
+9. Y. Li, S. Xie, X. Chen, P. Dollár, K. He, and R. Girshick. *Benchmarking Detection Transfer Learning with Vision Transformers.* arXiv:2111.11429, 2021. Training-recipe context linked by torchvision's R50-v2 documentation. [Original paper](https://arxiv.org/abs/2111.11429).
+10. C. Feng, Y. Zhong, Y. Gao, M. R. Scott, and W. Huang. *TOOD: Task-aligned One-stage Object Detection.* ICCV, 2021. Background for task-aligned assignment. [Original paper](https://arxiv.org/abs/2108.07755).
+11. X. Li, W. Wang, L. Wu, S. Chen, X. Hu, J. Li, J. Tang, and J. Yang. *Generalized Focal Loss: Learning Qualified and Distributed Bounding Boxes for Dense Object Detection.* NeurIPS, 2020. Background for distributional box regression. [Original paper](https://arxiv.org/abs/2006.04388).
+12. Ultralytics. Official [YOLO11 documentation and benchmark table](https://docs.ultralytics.com/models/yolo11/) and [RT-DETR documentation and benchmark table](https://docs.ultralytics.com/models/rtdetr/). [Source version 8.3.200](https://github.com/ultralytics/ultralytics/tree/v8.3.200): `ultralytics/models/rtdetr/predict.py`, `RTDETRPredictor.pre_transform`; `ultralytics/models/yolo/detect/val.py`, `DetectionValidator.postprocess`. Accessed October 31, 2026.
+13. PyTorch / torchvision. Official version 0.23 model and weight documentation: [Faster R-CNN MobileNetV3-320-FPN](https://docs.pytorch.org/vision/0.23/models/generated/torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn.html) and [Faster R-CNN ResNet50-FPN-v2](https://docs.pytorch.org/vision/0.23/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn_v2.html). Accessed October 31, 2026.
+14. T.-Y. Lin, P. Dollár, and COCO API contributors. Official [COCOeval source](https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py), `PythonAPI/pycocotools/cocoeval.py`. Experiment dependency: pycocotools 2.0.10. Accessed October 31, 2026.
+15. K. Liu. *DeepDataMiningLearning: ngdet tutorial.* Course starting point. [Repository](https://github.com/lkk688/DeepDataMiningLearning). Accessed October 31, 2026.
