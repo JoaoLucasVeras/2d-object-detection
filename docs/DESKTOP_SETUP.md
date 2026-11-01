@@ -7,7 +7,7 @@
 - Python 3.11, 64-bit, with the Python launcher (`py`): https://www.python.org/downloads/windows/
 - A current NVIDIA driver for the RTX 3060 Ti: https://www.nvidia.com/Download/index.aspx
 - Internet access and several GB free for the environment and checkpoints. Dataset storage is additional; plan capacity once datasets are finalized.
-- GitHub access to this private repository. Authenticate with Git Credential Manager when cloning, or use `gh auth login` followed by `gh repo clone`.
+- The repository is public; cloning does not require GitHub authentication. Authentication is required to push changes.
 
 The setup uses CUDA-enabled PyTorch wheels with their CUDA runtime. A separate CUDA Toolkit installation is not part of this setup. The installed NVIDIA driver must support the selected CUDA 12.6 runtime.
 
@@ -16,8 +16,8 @@ The setup uses CUDA-enabled PyTorch wheels with their CUDA runtime. A separate C
 Open PowerShell in the folder where you want to keep the project:
 
 ```powershell
-git clone https://github.com/JoaoLucasVeras/2d-object-detection-evaluation.git
-cd 2d-object-detection-evaluation
+git clone https://github.com/JoaoLucasVeras/2d-object-detection.git
+cd 2d-object-detection
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1
 ```
 

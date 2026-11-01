@@ -1,6 +1,6 @@
-# Pretrained 2D Object Detectors from COCO to KITTI: Accuracy, Speed, and Domain Shift
+# 2D Object Detection: Accuracy, Speed, and Domain Shift
 
-<p class="subtitle">CMPE 249 Homework — Track A (Experimental). João Lucas Veras. Code, configurations, and command log: <a href="https://github.com/JoaoLucasVeras/2d-object-detection-evaluation">github.com/JoaoLucasVeras/2d-object-detection-evaluation</a> (branch <code>main</code>).</p>
+<p class="subtitle">Pretrained detectors evaluated on COCO and KITTI<br>João Lucas Veras | CMPE 249 | Track A: Experimental Evaluation<br>Code, configurations, and experiment logs: <a href="https://github.com/JoaoLucasVeras/2d-object-detection">github.com/JoaoLucasVeras/2d-object-detection</a> (branch <code>main</code>).</p>
 
 ## 1. Goal and summary
 
@@ -195,7 +195,7 @@ For each model, `scripts/failure_analysis.py` searches thresholds 0.05–0.95 in
 * RT-DETR-L is most accurate here. Among tested KITTI configurations above 50 FPS, YOLO11s at 1280 has the highest AP (35.58). R50-v2 leads in KITTI recall and largely occluded subset AP, but costs more time and memory. These are configuration-specific findings, not hardware-independent rankings.
 * **Limitations.** Only one GPU, FP32, batch 1, and one full timing run per configuration were evaluated. There are no repeated-run confidence intervals or independent threshold-tuning data. The KITTI mapping is custom and has only 223 scored trucks. Predictions and datasets remain local to the desktop; the checked-in metrics cannot be independently recomputed without those artifacts or rerunning inference. Fine-tuning, repeated timing, native validation, and FP16/TensorRT tests are useful extensions.
 
-**AI assistance and reproducibility.** OpenAI Codex [16] was used for assistance with project setup, code development and review, interpretation of saved results, reference checking, and report drafting and editing. This citation acknowledges AI assistance; the experimental evidence comes from the saved desktop run artifacts. No new measurements were generated during report editing. Preserve dataset files, checkpoint versions, the environment freeze, and the repository revision when reproducing the work. The repository is private: grant the instructor access or include a ZIP of scripts, configurations, and logs with the PDF.
+**AI assistance and reproducibility.** OpenAI Codex [16] was used for assistance with project setup, code development and review, interpretation of saved results, reference checking, and report drafting and editing. This citation acknowledges AI assistance; the experimental evidence comes from the saved desktop run artifacts. No new measurements were generated during report editing. Preserve dataset files, checkpoint versions, the environment freeze, and the repository revision when reproducing the work. The public repository linked on the first page provides the experiment scripts, configurations, metrics, and command logs.
 
 ## 8. References
 

@@ -56,7 +56,8 @@ def main():
         return f'<table class="{css_class}">'
     body = re.sub(r'<table>', classify_table, body)
     html_path = ROOT / "report/report.html"
-    html_path.write_text(f"<!doctype html><html><head><meta charset='utf-8'><title>Track A report</title>"
+    title = source.splitlines()[0].removeprefix('# ').strip()
+    html_path.write_text(f"<!doctype html><html><head><meta charset='utf-8'><title>{title}</title>"
                          f"<style>{CSS}</style></head><body>{body}</body></html>", encoding="utf-8")
     pdf_path = ROOT / "report/report.pdf"
     profile_path = ROOT / "tmp/report-edge-profile"

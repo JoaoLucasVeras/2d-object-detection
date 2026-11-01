@@ -1,18 +1,18 @@
-# 2D Object Detection Evaluation
+# 2D Object Detection
 
-Track A experimental project for CMPE 249.
+Accuracy, speed, and domain shift across pretrained detectors on COCO and KITTI. Track A experimental project for CMPE 249.
 
 ## Start on the GPU desktop
 
 See [desktop setup](docs/DESKTOP_SETUP.md) for prerequisites and troubleshooting.
 
 ```powershell
-git clone https://github.com/JoaoLucasVeras/2d-object-detection-evaluation.git
-cd 2d-object-detection-evaluation
+git clone https://github.com/JoaoLucasVeras/2d-object-detection.git
+cd 2d-object-detection
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1
 ```
 
-This installs the project environment, verifies CUDA and GPU NMS, and smoke-tests three pretrained detectors. Python 3.11 (64-bit), Git, and a working NVIDIA driver must already be installed.
+This installs the project environment, verifies CUDA and GPU NMS, and smoke-tests five pretrained detector configurations. Python 3.11 (64-bit), Git, and a working NVIDIA driver must already be installed.
 
 ## Research question
 
@@ -44,7 +44,7 @@ Configurations: YOLO11n, YOLO11s, RT-DETR-L, Faster R-CNN MobileNetV3-320-FPN, a
 3. Prepare two datasets and define shared class mappings and ignore rules.
 4. Implement reproducible prediction and evaluation commands.
 5. Validate the pipeline on a small sample from each dataset.
-6. Evaluate all six model-dataset combinations.
+6. Evaluate all ten main model-dataset combinations, followed by the four ablations.
 7. Analyze accuracy, latency, memory, domain shift, and representative failures.
 8. Produce a 6-10 page PDF report or 15-25 slide PDF presentation.
 
